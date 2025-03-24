@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}My Meals | Meal Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9">
+        <h1 class="mb-4">My Meal History</h1>
+        
+        <div class="mb-4">
+            <a href="{% url 'log_meal' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Log New Meal
+            </a>
+        </div>
+        
+        {% if meals_by_date_with_calories %}
+            {% for date, meals in meals_by_date_with_calories.items %}
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ date|date:"F d, Y" }}</h5>
+                        
+                        <span class="badge bg-info">{{ meals.daily_calories|floatformat }} calories</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for meal in meals.meals %}
+                                <div class="list-group-item">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center">
+                                                {% if meal.recipe.image %}
+                                                    <img src="{{ meal.recipe.image.url }}" alt="{{ meal.recipe.name }}" 
+                                                        class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                                {% else %}
+                                                    <div class="me-3 bg-light d-flex align-items-center justify-content-center" 
+                                                        style="width: 60px; height: 60px; border-radius: 5px;">
+                                                        <i class="fas fa-utensils text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h5 class="mb-1">{{ meal.recipe.name }}</h5>
+                                                    <p class="text-muted mb-0 small">
+                                                        <i class="far fa-clock"></i> {{ meal.logged_at|time:"g:i A" }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="d-flex justify-content-around">
+                                                <div class="text-center">
+                                                    <div class="small text-muted">Calories</div>
+                                                    <div>{{ meal.recipe.calories|floatformat }}</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="small text-muted">Protein</div>
+                                                    <div>{{ meal.recipe.protein|floatformat }}g</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 text-end">
+                                            <a href="{% url 'recipe_detail' meal.recipe.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <p>You haven't logged any meals yet. Start by searching for a recipe and logging it!</p>
+                <a href="{% url 'recipe_list' %}" class="btn btn-info">Find Recipes</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card mb-4 sticky-top" style="top: 20px;">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Nutrition Summary</h5>
+            </div>
+            <div class="card-body">
+                <!-- Total Calories -->
+                <div class="text-center mb-4">
+                    <h4>{{ total_calories|floatformat }}</h4>
+                    <p class="text-muted">Total Calories Logged</p>
+                </div>
+                
+                <!-- Macro Nutrient Display -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold">Carbohydrates</span>
+                        <span class="h5 text-info">{{ total_carbs|floatformat }}g</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold">Proteins</span>
+                        <span class="h5 text-success">{{ total_proteins|floatformat }}g</span>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold">Fats</span>
+                        <span class="h5 text-warning">{{ total_fats|floatformat }}g</span>
+                    </div>
+                </div>
+                
+                <!-- Call to Actions -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'log_meal' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Log New Meal
+                    </a>
+                    <a href="{% url 'recommendations' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-lightbulb"></i> Get Recommendations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

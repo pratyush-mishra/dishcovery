@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Home | Meal Tracker{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title text-center mb-4">Find Your Perfect Recipe</h3>
+          <form action="{% url 'recipe_list' %}" method="get">
+            <div class="input-group">
+              {{ search_form.search_query|add_class:"form-control" }}
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+            <div class="small text-muted text-center mt-2">
+              Search for recipes by name, ingredients, or tags
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="mb-4">Popular Recipes</h2>
+        <div class="row">
+            {% for recipe in popular_recipes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-center py-5">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipe.name }}</h5>
+                            <div class="text-warning mb-2">
+                                {% with avg_rating=recipe.avg_rating|default:0 %}
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= avg_rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif forloop.counter <= avg_rating|add:"0.5" %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-1">{{ avg_rating|floatformat:1 }}</span>
+                                {% endwith %}
+                            </div>
+                            <p class="card-text small">
+                                <span class="badge bg-light text-dark">{{ recipe.calories|floatformat }} cal</span>
+                                <span class="badge bg-light text-dark">{{ recipe.cooking_time }} min</span>
+                            </p>
+                            <div class="d-grid">
+                                <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-primary btn-sm">View Recipe</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col">
+                    <p>No recipes available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2 class="mb-4 mt-5">Newest Recipes</h2>
+        <div class="row">
+            {% for recipe in newest_recipes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-center py-5">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipe.name }}</h5>
+                            <p class="card-text small">
+                                <span class="badge bg-light text-dark">{{ recipe.calories|floatformat }} cal</span>
+                                <span class="badge bg-light text-dark">{{ recipe.cooking_time }} min</span>
+                            </p>
+                            <div class="d-grid">
+                                <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-primary btn-sm">View Recipe</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col">
+                    <p>No recipes available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Track Your Nutrition</h4>
+            </div>
+            <div class="card-body">
+                <p>Log your meals, track calories, and monitor your nutrition with our easy-to-use meal tracker.</p>
+                {% if not user.is_authenticated %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'login' %}" class="btn btn-primary">Log In</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a>
+                    </div>
+                {% else %}
+                    <div class="d-grid">
+                        <a href="{% url 'meal_list' %}" class="btn btn-primary">View My Meals</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Features</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-utensils text-success me-2"></i> Log your daily meals
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-search text-success me-2"></i> Find recipes by ingredients
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-star text-success me-2"></i> Rate and review recipes
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-thumbs-up text-success me-2"></i> Get personalized recommendations
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-share-alt text-success me-2"></i> Share recipes with friends
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Share Recipe | Dishcovery{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ recipe.name }}</h2>
+    </div>
+    <div class="card-body">
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="img-fluid mb-3">
+        {% endif %}
+        <p><strong>Cooking Time:</strong> {{ recipe.cooking_time }} minutes</p>
+        <p><strong>Ingredients:</strong></p>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ recipe.ingredients }}</pre>
+        <p><strong>Recipe:</strong></p>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ recipe.recipe }}</pre>
+        <a href="javascript:window.print()" class="btn btn-primary mt-3">Print Recipe</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if recipe %}Edit Recipe{% else %}Create Recipe{% endif %} | Dishcovery
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h2 class="mb-0 text-center">
+          {% if recipe %}Edit Recipe{% else %}Create Recipe{% endif %}
+        </h2>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {# Display any non-field errors at the top #}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          {# Loop through each field for better control of label/input alignment #}
+          {% for field in form %}
+            <div class="mb-3 row">
+              <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label">
+                {{ field.label }}
+                {% if field.field.required %} *{% endif %}
+              </label>
+              <div class="col-sm-9">
+                {{ field }}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+
+          <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary">
+              {% if recipe %}Update Recipe{% else %}Create Recipe{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

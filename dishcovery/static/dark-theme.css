@@ -1,0 +1,157 @@
+/* Modern Light Theme for Dishcovery - Revised */
+:root {
+  --light-bg: #fcfcfc; /* slightly off-white for a softer background */
+  --light-surface: #ffffff;
+  --light-card: #ffffff;
+  --light-hover: #f0f0f0; /* a gentler hover tone */
+  --light-text: #333333; /* a deep, softened gray instead of harsh black */
+  --light-text-secondary: #666666;
+  --light-border: #e0e0e0; /* a light, unobtrusive border color */
+  --light-primary: #5b9bd5; /* a softer, pastel blue */
+  --light-primary-hover: #4a8ac4; /* a slightly darker variant for hover states */
+  --light-success: #28a745;
+  --light-warning: #ffc107;
+  --light-danger: #dc3545;
+  --light-info: #17a2b8;
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+}
+
+body {
+  background-color: var(--light-bg);
+  color: var(--light-text);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: var(--light-surface) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-brand, .nav-link {
+  color: var(--light-text) !important;
+  transition: color var(--transition-speed);
+}
+
+.navbar-brand:hover, .nav-link:hover {
+  color: var(--light-primary);
+}
+
+.navbar-toggler {
+  border-color: var(--light-border);
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  background-color: var(--light-surface);
+  border-color: var(--light-border);
+  border-radius: var(--border-radius);
+}
+
+.dropdown-item {
+  color: var(--light-text);
+  transition: background-color var(--transition-speed);
+}
+
+.dropdown-item:hover {
+  background-color: var(--light-hover);
+  color: var(--light-text);
+}
+
+/* Alerts */
+.alert {
+  background-color: var(--light-surface);
+  border: 1px solid var(--light-border);
+  border-radius: var(--border-radius);
+}
+
+/* Cards */
+.card {
+  background-color: var(--light-card);
+  border: 1px solid var(--light-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.card-header, .card-footer {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--light-border);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--light-primary);
+  border: none;
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--light-primary-hover);
+}
+
+/* Form elements */
+.form-control, .form-select {
+  background-color: var(--light-surface);
+  border: 1px solid var(--light-border);
+  border-radius: var(--border-radius);
+  color: var(--light-text);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--light-primary);
+  box-shadow: 0 0 0 0.2rem rgba(91, 155, 213, 0.25);
+}
+
+/* Tables */
+.table {
+  color: var(--light-text);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--light-hover);
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--light-border);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* Recipe detail */
+pre {
+  background-color: var(--light-bg);
+  border: 1px solid var(--light-border);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  color: var(--light-text);
+}

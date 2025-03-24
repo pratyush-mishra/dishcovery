@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}{{ recipe.name }} | Meal Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            {% if recipe.image %}
+                <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name }}">
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="card-title">{{ recipe.name }}</h1>
+                    <div>
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-star"></i> {{ recipe.get_average_rating|floatformat:1 }} ({{ recipe.ratings.count }})
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>{{ recipe.calories|floatformat }} cal</h5>
+                                <small>Calories</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>{{ recipe.protein|floatformat }}g</h5>
+                                <small>Protein</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>{{ recipe.carbs|floatformat }}g</h5>
+                                <small>Carbs</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>{{ recipe.fat|floatformat }}g</h5>
+                                <small>Fat</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>Ingredients</h4>
+                <ul class="list-group mb-4">
+                    {% for ingredient in recipe.ingredients.split|dictsort:0 %}
+                        <li class="list-group-item">{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h4>Instructions</h4>
+                <div class="mb-4">
+                    {{ recipe.recipe|linebreaks }}
+                </div>
+                
+                <div class="mb-3">
+                    <h5>Tags</h5>
+                    {% for tag in recipe.tags.split %}
+                        <a href="{% url 'recipe_list' %}?tags={{ tag }}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <div>
+                        <a href="{% url 'log_meal_with_recipe' recipe.id %}" class="btn btn-success">
+                            <i class="fas fa-utensils"></i> Log This Meal
+                        </a>
+                        <a href="{% url 'share_recipe' recipe.id %}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-share-alt"></i> Share
+                        </a>
+                    </div>
+                    {% if user == recipe.author %}
+                    <a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ratings Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Ratings & Reviews</h3>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    <div class="mb-4">
+                        <h5>{% if user_rating %}Update Your Rating{% else %}Rate This Recipe{% endif %}</h5>
+                        <form method="post" action="{% url 'rate_recipe' recipe.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_score">Score (1-5):</label>
+                                <input type="number" min="1" max="5" step="0.5" name="score" id="id_score" class="form-control" 
+                                    {% if user_rating %}value="{{ user_rating.score }}"{% endif %} required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_comment">Your Review:</label>
+                                <textarea name="comment" id="id_comment" rows="3" class="form-control">{% if user_rating %}{{ user_rating.comment }}{% endif %}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Rating</button>
+                        </form>
+                    </div>
+                {% endif %}
+                
+                <h5>User Reviews ({{ ratings.count }})</h5>
+                {% if ratings %}
+                    <div class="list-group">
+                        {% for rating in ratings %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">{{ rating.user.username }}</h6>
+                                    <small class="text-muted">{{ rating.rated_at|date }}</small>
+                                </div>
+                                <div class="mb-2">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= rating.score %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% elif forloop.counter <= rating.score|add:"0.5" %}
+                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2">{{ rating.score }}</span>
+                                </div>
+                                {% if rating.comment %}
+                                    <p class="mb-1">{{ rating.comment }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No reviews yet. Be the first to rate this recipe!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Similar Recipes Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Similar Recipes</h4>
+            </div>
+            <div class="card-body">
+                {% if similar_recipes %}
+                    <div class="row">
+                        {% for similar in similar_recipes %}
+                            <div class="col-6 mb-3">
+                                <a href="{% url 'recipe_detail' similar.id %}" class="text-decoration-none">
+                                    <div class="card h-100">
+                                        {% if similar.image %}
+                                            <img src="{{ similar.image.url }}" class="card-img-top" alt="{{ similar.name }}">
+                                        {% endif %}
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title">{{ similar.name }}</h6>
+                                            <div class="small text-warning">
+                                                <i class="fas fa-star"></i> {{ similar.get_average_rating|floatformat:1 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No similar recipes found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

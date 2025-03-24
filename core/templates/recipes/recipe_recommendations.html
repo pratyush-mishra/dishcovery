@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Recipe Recommendations | Meal Tracker{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Recommended Recipes For You</h1>
+
+{% if not recommended_recipes %}
+    <div class="alert alert-info">
+        <p>We don't have enough information to make personalized recommendations yet.</p>
+        <p>Try rating more recipes to help us understand your preferences better.</p>
+        <a href="{% url 'recipe_list' %}" class="btn btn-primary">Explore Recipes</a>
+    </div>
+{% else %}
+    <div class="mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Your Food Preferences</h4>
+            </div>
+            <div class="card-body">
+                <p>Based on your ratings, we've noticed you enjoy recipes with:</p>
+                <div class="mb-3">
+                    {% for tag in favorite_tags %}
+                        <span class="badge bg-primary me-2">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <p>Here are some recipes we think you'll love:</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for recipe in recommended_recipes %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light text-center py-5">
+                            <i class="fas fa-utensils fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.name }}</h5>
+                        <div class="mb-2">
+                            <div class="text-warning">
+                                {% with avg_rating=recipe.get_average_rating %}
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= avg_rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif forloop.counter <= avg_rating|add:"0.5" %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-1">{{ avg_rating|floatformat:1 }}</span>
+                                {% endwith %}
+                            </div>
+                            <small class="text-muted">{{ recipe.ratings.count }} rating{{ recipe.ratings.count|pluralize }}</small>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge bg-light text-dark">{{ recipe.calories|floatformat }} cal</span>
+                            <span class="badge bg-light text-dark">{{ recipe.cooking_time }} min</span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-outline-primary btn-sm">View Recipe</a>
+                            <a href="{% url 'log_meal_with_recipe' recipe.id %}" class="btn btn-outline-success btn-sm">Log Meal</a>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            {% for tag in recipe.tags.split|slice:":3" %}
+                                <a href="{% url 'recipe_list' %}?tags={{ tag }}" class="text-decoration-none">
+                                    <span class="badge bg-secondary">{{ tag }}</span>
+                                </a>
+                            {% endfor %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
