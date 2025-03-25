@@ -24,4 +24,6 @@ urlpatterns = [
     
     # Recommendations
     path('recommendations/', views.recipe_recommendations, name='recommendations'),
+    path('ajax/recipes/', views.ajax_recipe_search, name='ajax_recipe_search'),
+
 ]

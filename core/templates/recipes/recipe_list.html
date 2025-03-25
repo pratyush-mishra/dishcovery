@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Recipes | Meal Tracker{% endblock %}
+{% block title %}Recipes | Dishcovery{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -146,4 +146,25 @@
         {% endif %}
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{% url 'ajax_recipe_search' %}",
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    $('.row .col-md-9 .row').html(data.html);
+                },
+                error: function () {
+                    alert("Failed to load recipes. Please try again.");
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -9,6 +9,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import AuthenticationForm
+from django.template.loader import render_to_string
+from django.http import JsonResponse
 
 from .models import User, Recipe, Meal, Rating
 from .forms import CustomUserCreationForm, RecipeForm, MealLogForm, RatingForm, RecipeSearchForm
@@ -342,3 +344,30 @@ def home_view(request):
         'search_form': RecipeSearchForm(),
     }
     return render(request, 'home.html', context)
+
+def ajax_recipe_search(request):
+    form = RecipeSearchForm(request.GET)
+    recipes = Recipe.objects.all()
+
+    if form.is_valid():
+        search_query = form.cleaned_data.get('search_query')
+        tags = form.cleaned_data.get('tags')
+        min_protein = form.cleaned_data.get('min_protein')
+        max_calories = form.cleaned_data.get('max_calories')
+
+        if search_query:
+            recipes = recipes.filter(
+                Q(name__icontains=search_query) | 
+                Q(ingredients__icontains=search_query)
+            )
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(',')]
+            for tag in tag_list:
+                recipes = recipes.filter(tags__icontains=tag)
+        if min_protein:
+            recipes = recipes.filter(protein__gte=min_protein)
+        if max_calories:
+            recipes = recipes.filter(calories__lte=max_calories)
+
+    html = render_to_string('recipes/recipe_cards.html', {'recipes': recipes}, request=request)
+    return JsonResponse({'html': html})
